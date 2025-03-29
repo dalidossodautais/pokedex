@@ -2,6 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { PokemonController } from "./pokemon.controller";
 import { PokemonService } from "./pokemon.service";
 import { HttpException } from "@nestjs/common";
+import { CACHE_MANAGER, CacheModule } from "@nestjs/cache-manager";
 
 describe("PokemonController", () => {
   let controller: PokemonController;
@@ -11,13 +12,23 @@ describe("PokemonController", () => {
     getPokemon: jest.fn(),
   };
 
+  const mockCacheManager = {
+    get: jest.fn(),
+    set: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [CacheModule.register()],
       controllers: [PokemonController],
       providers: [
         {
           provide: PokemonService,
           useValue: mockPokemonService,
+        },
+        {
+          provide: CACHE_MANAGER,
+          useValue: mockCacheManager,
         },
       ],
     }).compile();
@@ -38,10 +49,14 @@ describe("PokemonController", () => {
         types: ["electric"],
         height: 4,
         weight: 60,
-        stats: [
-          { name: "hp", value: 35 },
-          { name: "attack", value: 55 },
-        ],
+        stats: {
+          hp: 35,
+          attack: 55,
+          defense: 40,
+          specialAttack: 50,
+          specialDefense: 40,
+          speed: 90,
+        },
         sprites: {
           front_default: "https://example.com/pikachu.png",
           back_default: "https://example.com/pikachu-back.png",

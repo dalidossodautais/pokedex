@@ -1,7 +1,9 @@
 import { Pokemon } from "@monorepo/types";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Inject } from "@nestjs/common";
 import axios, { AxiosResponse } from "axios";
 import { PokemonBody } from "./pokemon.interface";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
 
 const getBaseStat = (
   name: string,
@@ -14,14 +16,23 @@ const getBaseStat = (
 export class PokemonService {
   private readonly pokeApiUrl = "https://pokeapi.co/api/v2";
 
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+
   public getPokemon = async (id: string): Promise<Pokemon | null> => {
+    const cacheKey = `pokemon:${id}`;
+    const cachedPokemon = await this.cacheManager.get<Pokemon>(cacheKey);
+
+    if (cachedPokemon) {
+      return cachedPokemon;
+    }
+
     const response: AxiosResponse<PokemonBody> = await axios.get(
       `${this.pokeApiUrl}/pokemon/${id}`,
     );
 
     const pokemon = response.data;
 
-    return {
+    const formattedPokemon: Pokemon = {
       id: pokemon.id,
       name: pokemon.name,
       types: pokemon.types.map((type) => type.type.name),
@@ -40,5 +51,9 @@ export class PokemonService {
         back_default: pokemon.sprites.back_default,
       },
     };
+
+    await this.cacheManager.set(cacheKey, formattedPokemon);
+
+    return formattedPokemon;
   };
 }

@@ -4,14 +4,17 @@ import {
   Param,
   HttpException,
   HttpStatus,
+  UseInterceptors,
 } from "@nestjs/common";
 import { PokemonService } from "./pokemon.service";
 import { AxiosError } from "axios";
+import { CacheInterceptor } from "@nestjs/cache-manager";
 
 @Controller("pokemon")
 export class PokemonController {
   constructor(private readonly pokemonService: PokemonService) {}
 
+  @UseInterceptors(CacheInterceptor)
   @Get(":id")
   async getPokemon(@Param("id") id: string) {
     if (isNaN(Number(id))) {
