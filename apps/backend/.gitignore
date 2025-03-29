@@ -1,0 +1,6 @@
+# Compiled output
+/dist
+
+# Local configuration
+*.local.ts
+*.local.js
