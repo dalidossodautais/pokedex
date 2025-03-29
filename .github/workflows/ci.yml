@@ -45,7 +45,6 @@ jobs:
 
       - name: Run ESLint
         run: pnpm lint
-        if: success() || failure()
 
       - name: Run unit tests
         run: pnpm test:unit
