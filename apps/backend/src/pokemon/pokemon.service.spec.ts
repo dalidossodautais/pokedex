@@ -2,6 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { PokemonService } from "./pokemon.service";
 import axios from "axios";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { mockBasePokemon, mockPokemonFr } from "./pokemon.mock";
 
 describe("PokemonService", () => {
   let service: PokemonService;
@@ -92,48 +93,6 @@ describe("PokemonService", () => {
       ],
     };
 
-    const basePokemon = {
-      id: 25,
-      name: "pikachu",
-      description: undefined,
-      types: [{ name: "electric", code: "electric" }],
-      height: 4,
-      weight: 60,
-      stats: [
-        { name: "hp", value: 35 },
-        { name: "attack", value: 55 },
-        { name: "defense", value: 40 },
-        { name: "special-attack", value: 50 },
-        { name: "special-defense", value: 40 },
-        { name: "speed", value: 90 },
-      ],
-      sprites: {
-        front_default: "https://example.com/pikachu.png",
-        back_default: "https://example.com/pikachu-back.png",
-      },
-    };
-
-    const formattedPokemonFr = {
-      id: 25,
-      name: "Pikachu",
-      description: "Souris électrique",
-      types: [{ name: "Électrik", code: "electric" }],
-      height: 4,
-      weight: 60,
-      stats: [
-        { name: "PV", value: 35 },
-        { name: "attack", value: 55 },
-        { name: "defense", value: 40 },
-        { name: "special-attack", value: 50 },
-        { name: "special-defense", value: 40 },
-        { name: "speed", value: 90 },
-      ],
-      sprites: {
-        front_default: "https://example.com/pikachu.png",
-        back_default: "https://example.com/pikachu-back.png",
-      },
-    };
-
     it("should return pokemon data in English by default from API when not in cache", async () => {
       // Mock base Pokemon cache miss but species/type/stat data hits
       cacheMock.get.mockImplementation((key: string) => {
@@ -172,7 +131,7 @@ describe("PokemonService", () => {
 
     it("should return pokemon data in French when language parameter is provided", async () => {
       cacheMock.get.mockImplementation((key: string) => {
-        if (key === "base-pokemon:25") return basePokemon;
+        if (key === "base-pokemon:25") return mockBasePokemon;
         if (key === "pokemon:25:fr") return null;
         if (key === "type:electric:fr") return null;
         if (key === "stat:hp:fr") return null;
@@ -204,7 +163,7 @@ describe("PokemonService", () => {
 
     it("should return pokemon data from cache when available for the specified language", async () => {
       cacheMock.get.mockImplementation((key: string) => {
-        if (key === "pokemon:25:fr") return formattedPokemonFr;
+        if (key === "pokemon:25:fr") return mockPokemonFr;
         return null;
       });
 
@@ -213,23 +172,12 @@ describe("PokemonService", () => {
       expect(cacheMock.get).toHaveBeenCalledWith("pokemon:25:fr");
       expect(getSpy).not.toHaveBeenCalled();
       expect(cacheMock.set).not.toHaveBeenCalled();
-      expect(result).toEqual(formattedPokemonFr);
+      expect(result).toEqual(mockPokemonFr);
     });
 
     it("should handle API errors properly while still using defaults", async () => {
-      // Pour ce test, nous devons nous adapter au comportement réel du service
-      // qui dans le cas d'une erreur API conserve les données de base mais peut
-      // avoir déjà récupéré certaines données du cache
-      const modifiedBasePokemon = {
-        ...basePokemon,
-        name: "Pikachu",
-        description: "Souris électrique", // Le service conserve la description
-      };
-
       cacheMock.get.mockImplementation((key: string) => {
-        if (key === "base-pokemon:25") return modifiedBasePokemon;
-        // Pour les autres requêtes de cache, retourner directement les valeurs pour éviter
-        // les appels d'API qui échouent
+        if (key === "base-pokemon:25") return mockBasePokemon;
         if (key.startsWith("type:")) return "Electric";
         if (key.startsWith("stat:")) return "HP";
         return null;
@@ -244,9 +192,7 @@ describe("PokemonService", () => {
 
       const result = await service.getPokemon("25");
 
-      // Vérifier que les valeurs par défaut sont conservées
       expect(result.name).toEqual("Pikachu");
-      // La description est déjà définie dans modifiedBasePokemon
       expect(result.description).toEqual("Souris électrique");
     });
   });

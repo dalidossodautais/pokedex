@@ -3,6 +3,7 @@ import { PokemonController } from "./pokemon.controller";
 import { PokemonService } from "./pokemon.service";
 import { HttpException } from "@nestjs/common";
 import { CACHE_MANAGER, CacheModule } from "@nestjs/cache-manager";
+import { mockPokemonEn, mockPokemonFr } from "./pokemon.mock";
 
 describe("PokemonController", () => {
   let controller: PokemonController;
@@ -18,6 +19,7 @@ describe("PokemonController", () => {
   };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
       imports: [CacheModule.register()],
       controllers: [PokemonController],
@@ -43,60 +45,20 @@ describe("PokemonController", () => {
 
   describe("getPokemon", () => {
     it("should return pokemon data when given a valid ID with default language", async () => {
-      const mockPokemon = {
-        id: 25,
-        name: "pikachu",
-        types: [{ name: "electric", code: "electric" }],
-        height: 4,
-        weight: 60,
-        stats: [
-          { name: "hp", value: 35 },
-          { name: "attack", value: 55 },
-          { name: "defense", value: 40 },
-          { name: "specialAttack", value: 50 },
-          { name: "specialDefense", value: 40 },
-          { name: "speed", value: 90 },
-        ],
-        sprites: {
-          front_default: "https://example.com/pikachu.png",
-          back_default: "https://example.com/pikachu-back.png",
-        },
-      };
-
-      mockPokemonService.getPokemon.mockResolvedValueOnce(mockPokemon);
+      mockPokemonService.getPokemon.mockResolvedValueOnce(mockPokemonEn);
 
       const result = await controller.getPokemon("25");
 
-      expect(result).toEqual(mockPokemon);
+      expect(result).toEqual(mockPokemonEn);
       expect(service.getPokemon).toHaveBeenCalledWith("25", "en");
     });
 
     it("should return pokemon data with specified language", async () => {
-      const mockPokemon = {
-        id: 25,
-        name: "Pikachu",
-        types: [{ name: "Électrik", code: "electric" }],
-        height: 4,
-        weight: 60,
-        stats: [
-          { name: "PV", value: 35 },
-          { name: "Attaque", value: 55 },
-          { name: "Défense", value: 40 },
-          { name: "Attaque Spéciale", value: 50 },
-          { name: "Défense Spéciale", value: 40 },
-          { name: "Vitesse", value: 90 },
-        ],
-        sprites: {
-          front_default: "https://example.com/pikachu.png",
-          back_default: "https://example.com/pikachu-back.png",
-        },
-      };
-
-      mockPokemonService.getPokemon.mockResolvedValueOnce(mockPokemon);
+      mockPokemonService.getPokemon.mockResolvedValueOnce(mockPokemonFr);
 
       const result = await controller.getPokemon("25", "fr");
 
-      expect(result).toEqual(mockPokemon);
+      expect(result).toEqual(mockPokemonFr);
       expect(service.getPokemon).toHaveBeenCalledWith("25", "fr");
     });
 

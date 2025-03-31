@@ -15,8 +15,6 @@ const defaultLang = "en";
 @Injectable()
 export class PokemonService {
   private readonly pokeApiUrl = "https://pokeapi.co/api/v2";
-  private typeTranslations: Record<string, Record<string, string>> = {};
-  private statTranslations: Record<string, Record<string, string>> = {};
 
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
@@ -39,7 +37,7 @@ export class PokemonService {
 
         translation = localizedName || typeName;
 
-        await this.cacheManager.set(cacheKey, translation, 86400000);
+        await this.cacheManager.set(cacheKey, translation);
       }
 
       return translation;
@@ -71,7 +69,7 @@ export class PokemonService {
 
         translation = localizedName || statName;
 
-        await this.cacheManager.set(cacheKey, translation, 86400000);
+        await this.cacheManager.set(cacheKey, translation);
       }
 
       return translation;

@@ -68,12 +68,7 @@ describe("AppController (e2e)", () => {
         .expect(200)
         .expect((res) => {
           expect(res.body).toHaveProperty("id", 25);
-
-          // Le nom pourrait être "Pikachu" même en français, donc on ne vérifie pas
-          // la valeur exacte mais seulement sa présence
           expect(res.body).toHaveProperty("name");
-
-          // Vérifier que le type est bien traduit en français (Électrik)
           expect(res.body.types).toEqual(
             expect.arrayContaining([
               expect.objectContaining({
@@ -82,12 +77,10 @@ describe("AppController (e2e)", () => {
               }),
             ]),
           );
-
-          // Vérifier que les statistiques sont en français
           expect(res.body.stats).toEqual(
             expect.arrayContaining([
               expect.objectContaining({
-                name: "PV", // HP en français
+                name: "PV",
                 value: expect.any(Number) as unknown,
               }),
             ]),
