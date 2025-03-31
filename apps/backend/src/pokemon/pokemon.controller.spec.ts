@@ -42,21 +42,21 @@ describe("PokemonController", () => {
   });
 
   describe("getPokemon", () => {
-    it("should return pokemon data when given a valid ID", async () => {
+    it("should return pokemon data when given a valid ID with default language", async () => {
       const mockPokemon = {
         id: 25,
         name: "pikachu",
-        types: ["electric"],
+        types: [{ name: "electric", code: "electric" }],
         height: 4,
         weight: 60,
-        stats: {
-          hp: 35,
-          attack: 55,
-          defense: 40,
-          specialAttack: 50,
-          specialDefense: 40,
-          speed: 90,
-        },
+        stats: [
+          { name: "hp", value: 35 },
+          { name: "attack", value: 55 },
+          { name: "defense", value: 40 },
+          { name: "specialAttack", value: 50 },
+          { name: "specialDefense", value: 40 },
+          { name: "speed", value: 90 },
+        ],
         sprites: {
           front_default: "https://example.com/pikachu.png",
           back_default: "https://example.com/pikachu-back.png",
@@ -68,7 +68,36 @@ describe("PokemonController", () => {
       const result = await controller.getPokemon("25");
 
       expect(result).toEqual(mockPokemon);
-      expect(service.getPokemon).toHaveBeenCalledWith("25");
+      expect(service.getPokemon).toHaveBeenCalledWith("25", "en");
+    });
+
+    it("should return pokemon data with specified language", async () => {
+      const mockPokemon = {
+        id: 25,
+        name: "Pikachu",
+        types: [{ name: "Électrik", code: "electric" }],
+        height: 4,
+        weight: 60,
+        stats: [
+          { name: "PV", value: 35 },
+          { name: "Attaque", value: 55 },
+          { name: "Défense", value: 40 },
+          { name: "Attaque Spéciale", value: 50 },
+          { name: "Défense Spéciale", value: 40 },
+          { name: "Vitesse", value: 90 },
+        ],
+        sprites: {
+          front_default: "https://example.com/pikachu.png",
+          back_default: "https://example.com/pikachu-back.png",
+        },
+      };
+
+      mockPokemonService.getPokemon.mockResolvedValueOnce(mockPokemon);
+
+      const result = await controller.getPokemon("25", "fr");
+
+      expect(result).toEqual(mockPokemon);
+      expect(service.getPokemon).toHaveBeenCalledWith("25", "fr");
     });
 
     it("should throw HttpException when given an invalid ID", async () => {

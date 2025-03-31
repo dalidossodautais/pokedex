@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication } from "@nestjs/common";
 import * as request from "supertest";
@@ -27,10 +28,16 @@ describe("AppController (e2e)", () => {
         .expect(200)
         .expect((res) => {
           expect(res.body).toHaveProperty("id", 25);
-          expect(res.body).toHaveProperty("name", "pikachu");
+          expect(res.body).toHaveProperty("name", "Pikachu");
 
           expect(res.body).toHaveProperty("types");
-          expect(res.body.types).toEqual(expect.arrayContaining(["electric"]));
+          expect(res.body.types).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                code: "electric",
+              }),
+            ]),
+          );
 
           expect(res.body).toHaveProperty("height");
           expect(res.body.height).toEqual(expect.any(Number));
@@ -38,13 +45,14 @@ describe("AppController (e2e)", () => {
           expect(res.body.weight).toEqual(expect.any(Number));
 
           expect(res.body).toHaveProperty("stats");
-          expect(res.body.stats).toHaveProperty("hp");
-          expect(res.body.stats).toHaveProperty("attack");
-          expect(res.body.stats).toHaveProperty("defense");
-          expect(res.body.stats).toHaveProperty("specialAttack");
-          expect(res.body.stats).toHaveProperty("specialDefense");
-          expect(res.body.stats).toHaveProperty("speed");
-          expect(res.body.stats.hp).toEqual(expect.any(Number));
+          expect(res.body.stats).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                name: expect.any(String) as unknown,
+                value: expect.any(Number) as unknown,
+              }),
+            ]),
+          );
 
           expect(res.body).toHaveProperty("sprites");
           expect(res.body.sprites).toHaveProperty("front_default");
@@ -54,15 +62,51 @@ describe("AppController (e2e)", () => {
         });
     });
 
+    it("should return French pokemon data when lang parameter is fr", () => {
+      return request(app.getHttpServer())
+        .get("/pokemon/25?lang=fr")
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toHaveProperty("id", 25);
+
+          // Le nom pourrait être "Pikachu" même en français, donc on ne vérifie pas
+          // la valeur exacte mais seulement sa présence
+          expect(res.body).toHaveProperty("name");
+
+          // Vérifier que le type est bien traduit en français (Électrik)
+          expect(res.body.types).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                name: "Électrik",
+                code: "electric",
+              }),
+            ]),
+          );
+
+          // Vérifier que les statistiques sont en français
+          expect(res.body.stats).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                name: "PV", // HP en français
+                value: expect.any(Number) as unknown,
+              }),
+            ]),
+          );
+        });
+    });
+
     it("should return detailed info for bulbasaur", () => {
       return request(app.getHttpServer())
         .get("/pokemon/1")
         .expect(200)
         .expect((res) => {
           expect(res.body).toHaveProperty("id", 1);
-          expect(res.body).toHaveProperty("name", "bulbasaur");
+          expect(res.body).toHaveProperty("name", "Bulbasaur");
           expect(res.body.types).toEqual(
-            expect.arrayContaining(["grass", "poison"]),
+            expect.arrayContaining([
+              expect.objectContaining({ code: "grass" }),
+              expect.objectContaining({ code: "poison" }),
+            ]),
           );
         });
     });
@@ -86,6 +130,12 @@ describe("AppController (e2e)", () => {
       await request(app.getHttpServer()).get("/pokemon/1").expect(200);
       await request(app.getHttpServer()).get("/pokemon/4").expect(200);
       await request(app.getHttpServer()).get("/pokemon/7").expect(200);
+    });
+
+    it("should handle multiple languages in sequence", async () => {
+      await request(app.getHttpServer()).get("/pokemon/1?lang=en").expect(200);
+      await request(app.getHttpServer()).get("/pokemon/1?lang=fr").expect(200);
+      await request(app.getHttpServer()).get("/pokemon/1?lang=es").expect(200);
     });
 
     it("should respect query param limits if implemented", async () => {

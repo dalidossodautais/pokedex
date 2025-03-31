@@ -6,46 +6,48 @@ Ce monorepo contient tous les projets liés à l'application Pokedex.
 
 - `apps/` - Applications complètes
   - `backend/` - API NestJS pour le Pokedex
+  - `frontend/` - Application React pour le Pokedex
 - `packages/` - Bibliothèques partagées
+  - `types/` - Types partagés entre les applications
+
+## Fonctionnalités
+
+- Recherche de Pokémon par nom ou ID
+- Affichage des détails des Pokémon (stats, types, évolutions, etc.)
+- Localisation en français et anglais
+- Interface responsive
 
 ## Installation
 
 ```bash
+# Installation des dépendances
 pnpm install
 ```
 
 ## Développement
 
-Pour démarrer le développement sur l'application backend :
-
 ```bash
-pnpm start:dev
+# Démarrer le backend en mode développement
+pnpm start:dev:backend
+
+# Démarrer le frontend en mode développement
+pnpm start:dev:frontend
 ```
 
 ## Tests
 
-Pour exécuter les tests sur tous les projets :
-
 ```bash
+# Exécuter les tests unitaires sur tous les projets
 pnpm test
-```
 
-Pour exécuter les tests sur un projet spécifique :
-
-```bash
+# Exécuter les tests sur un projet spécifique
 pnpm --filter backend test
 ```
 
-## Construction
+## Technologies utilisées
 
-Pour construire tous les projets :
-
-```bash
-pnpm build
-```
-
-Pour construire un projet spécifique :
-
-```bash
-pnpm --filter backend build
-```
+- **Backend**: NestJS, TypeScript
+- **Frontend**: React, TypeScript, Vite, Redux Toolkit
+- **Tests**: Jest, Vitest
+- **Styles**: Styled Components
+- **Localisation**: i18next

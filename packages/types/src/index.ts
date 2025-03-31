@@ -1,17 +1,11 @@
 export interface Pokemon {
   id: number;
   name: string;
-  types: string[];
+  description: string;
+  types: { name: string; code: string }[];
   height: number;
   weight: number;
-  stats: {
-    hp: number;
-    attack: number;
-    defense: number;
-    specialAttack: number;
-    specialDefense: number;
-    speed: number;
-  };
+  stats: { name: string; value: number }[];
   sprites: {
     front_default: string;
     back_default: string;
