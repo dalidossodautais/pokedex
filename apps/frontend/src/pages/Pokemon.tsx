@@ -4,9 +4,9 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useGetPokemonByIdQuery } from "../store/services/pokemon";
 import PokemonStat from "../components/PokemonStat";
-import LanguageSelector from "../components/LanguageSelector";
+import { Button, Card } from "@pokedex/ui";
+import Layout from "../components/Layout";
 
-// Utilitaires
 const capitalize = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
@@ -15,71 +15,10 @@ const formatId = (id: number): string => {
   return `#${id.toString().padStart(3, "0")}`;
 };
 
-// Composants stylisés
-const Container = styled.div`
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: ${({ theme }) => theme.spacing.lg};
-  position: relative;
-  gap: ${({ theme }) => theme.spacing.md};
-`;
-
-const Card = styled.div`
-  background-color: white;
-  border-radius: ${({ theme }) => theme.borderRadius.large};
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  padding: ${({ theme }) => theme.spacing.xl};
-  width: 100%;
-  max-width: 800px;
-  min-width: 300px;
-  position: relative;
-
-  @media (max-width: 400px) {
-    padding: ${({ theme }) => `${theme.spacing.lg} ${theme.spacing.md}`};
-  }
-`;
-
-const BackButton = styled.button`
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+const BackButton = styled(Button)`
   padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
-  background-color: ${({ theme }) => theme.colors.primary};
-  color: white;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
-  font-weight: bold;
-  transition: all 0.3s ease;
-  margin-bottom: ${({ theme }) => theme.spacing.md};
-  align-self: flex-start;
-
-  &:hover:not(:disabled) {
-    background-color: #b00823;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(220, 10, 45, 0.3);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
-  }
-
-  &:disabled {
-    background-color: #cccccc;
-    color: #666666;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-  }
-`;
-
-const LanguageSelectorContainer = styled.div`
-  position: fixed;
-  top: ${({ theme }) => theme.spacing.md};
-  right: ${({ theme }) => theme.spacing.md};
-  z-index: 100;
+  font-size: ${({ theme }) => theme.fontSizes.small};
 `;
 
 const Header = styled.div`
@@ -114,7 +53,6 @@ const TypeBadge = styled.span<{ $type: string }>`
   padding: ${({ theme }) => `${theme.spacing.xs} ${theme.spacing.md}`};
   border-radius: ${({ theme }) => theme.borderRadius.small};
   background-color: ${({ theme, $type }) => {
-    // Assurons-nous que le type existe dans notre thème, sinon on utilise normal
     return (
       theme.colors.typeColors[$type as keyof typeof theme.colors.typeColors] ||
       theme.colors.typeColors.normal
@@ -240,15 +178,10 @@ const DescriptionText = styled.p`
   padding: 0;
 `;
 
-// Fonction utilitaire pour nettoyer la description
 const cleanDescription = (description: string): string => {
   if (!description) return "";
 
-  // Simplement remplacer tous les caractères spéciaux par des espaces
-  return description
-    .replace(/[◀►]/g, " ") // Remplacer les flèches par des espaces
-    .replace(/\s+/g, " ") // Normaliser les espaces multiples en un seul espace
-    .trim(); // Enlever les espaces en début et fin
+  return description.replace(/[◀►]/g, " ").replace(/\s+/g, " ").trim();
 };
 
 const PokemonPage = () => {
@@ -256,7 +189,6 @@ const PokemonPage = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
 
-  // Requête avec la langue actuelle de i18n
   const {
     data: pokemon,
     error,
@@ -266,12 +198,10 @@ const PokemonPage = () => {
     lang: i18n.language as "fr" | "en" | "es" | "it" | "de",
   });
 
-  // Revenir à la page d'accueil
   const handleBack = () => {
     void navigate(-1);
   };
 
-  // Définir le titre de la page
   useEffect(() => {
     if (pokemon) {
       document.title = `Pokédex - ${capitalize(pokemon.name)}`;
@@ -284,56 +214,34 @@ const PokemonPage = () => {
     };
   }, [pokemon]);
 
-  // Type principal pour les couleurs
   const mainType = pokemon?.types[0]?.code || "normal";
 
+  let content = null;
+
   if (isLoading) {
-    return (
-      <Container>
-        <LanguageSelectorContainer>
-          <LanguageSelector />
-        </LanguageSelectorContainer>
-
-        <BackButton onClick={handleBack}>{t("backButton")}</BackButton>
-        <Card>
-          <Header>
-            <PokemonName>{t("loading")}</PokemonName>
-          </Header>
-          <LoadingContainer>
-            <LoadingText>{t("loadingPokemon")}</LoadingText>
-          </LoadingContainer>
-        </Card>
-      </Container>
+    content = (
+      <>
+        <Header>
+          <PokemonName>{t("loading")}</PokemonName>
+        </Header>
+        <LoadingContainer>
+          <LoadingText>{t("loadingPokemon")}</LoadingText>
+        </LoadingContainer>
+      </>
     );
-  }
-
-  if (error || !pokemon) {
-    return (
-      <Container>
-        <LanguageSelectorContainer>
-          <LanguageSelector />
-        </LanguageSelectorContainer>
-
-        <BackButton onClick={handleBack}>{t("backButton")}</BackButton>
-        <Card>
-          <ErrorContainer>
-            <ErrorMessage>
-              {error ? t("errorTitle") : t("errorNotFound")}
-            </ErrorMessage>
-          </ErrorContainer>
-        </Card>
-      </Container>
+  } else if (error || !pokemon) {
+    content = (
+      <>
+        <ErrorContainer>
+          <ErrorMessage>
+            {error ? t("errorTitle") : t("errorNotFound")}
+          </ErrorMessage>
+        </ErrorContainer>
+      </>
     );
-  }
-
-  return (
-    <Container>
-      <LanguageSelectorContainer>
-        <LanguageSelector />
-      </LanguageSelectorContainer>
-
-      <BackButton onClick={handleBack}>{t("backButton")}</BackButton>
-      <Card>
+  } else {
+    content = (
+      <>
         <Header>
           <PokemonName>{pokemon.name}</PokemonName>
           <PokemonId>{formatId(pokemon.id)}</PokemonId>
@@ -385,8 +293,17 @@ const PokemonPage = () => {
             <InfoValue>{pokemon.weight / 10} kg</InfoValue>
           </InfoCard>
         </InfoGrid>
+      </>
+    );
+  }
+
+  return (
+    <Layout>
+      <Card>
+        <BackButton onClick={handleBack}>{t("backButton")}</BackButton>
+        {content}
       </Card>
-    </Container>
+    </Layout>
   );
 };
 

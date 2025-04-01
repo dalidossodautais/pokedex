@@ -1,7 +1,7 @@
 {
   "name": "frontend",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "build": "tsc -b && vite build",
@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@monorepo/types": "workspace:*",
+    "@pokedex/ui": "workspace:*",
     "@reduxjs/toolkit": "^2.6.1",
     "@types/styled-components": "^5.1.34",
     "i18next": "^24.2.3",
@@ -27,16 +28,12 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^15.0.0",
     "@testing-library/user-event": "^14.4.3",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "@vitejs/plugin-react": "^4.3.4",
-    "eslint": "^9.21.0",
-    "eslint-plugin-react-hooks": "^5.1.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
     "globals": "^15.15.0",
     "jsdom": "^24.0.0",
     "typescript": "~5.7.2",
-    "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0",
     "vitest": "^1.6.0"
   }
