@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { useGetPokemonByIdQuery } from "../store/services/pokemon";
+import { useGetPokemonByIdQuery } from "@/store/services/pokemon";
 
 interface PokemonLinkProps {
   id: string;

@@ -1,7 +1,8 @@
 import styled from "styled-components";
 import LanguageSelector from "./LanguageSelector";
+import { ReactNode } from "react";
 
-export const Container = styled.div`
+const Container = styled.div`
   min-height: 100vh;
   width: 100%;
   display: flex;
@@ -20,7 +21,11 @@ const LanguageSelectorContainer = styled.div`
   z-index: 100;
 `;
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+export interface LayoutProps {
+  children: ReactNode;
+}
+
+const Layout = ({ children }: LayoutProps) => {
   return (
     <Container>
       <LanguageSelectorContainer>

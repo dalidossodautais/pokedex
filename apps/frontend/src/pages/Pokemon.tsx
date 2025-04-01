@@ -4,8 +4,9 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useGetPokemonByIdQuery } from "../store/services/pokemon";
 import PokemonStat from "../components/PokemonStat";
-import { Button, Card } from "@pokedex/ui";
-import Layout from "../components/Layout";
+import { Button, Card, CardBox } from "@pokedex/ui";
+import Layout from "@/components/Layout";
+import { getTypeColor } from "@/theme/pokemon";
 
 const capitalize = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -52,12 +53,7 @@ const TypesContainer = styled.div`
 const TypeBadge = styled.span<{ $type: string }>`
   padding: ${({ theme }) => `${theme.spacing.xs} ${theme.spacing.md}`};
   border-radius: ${({ theme }) => theme.borderRadius.small};
-  background-color: ${({ theme, $type }) => {
-    return (
-      theme.colors.typeColors[$type as keyof typeof theme.colors.typeColors] ||
-      theme.colors.typeColors.normal
-    );
-  }};
+  background-color: ${({ $type }) => getTypeColor($type)};
   color: white;
   font-size: ${({ theme }) => theme.fontSizes.small};
   font-weight: bold;
@@ -65,23 +61,22 @@ const TypeBadge = styled.span<{ $type: string }>`
 `;
 
 const Content = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: ${({ theme }) => theme.spacing.xl};
+`;
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
+const MidCardBox = styled(CardBox)`
+  @media (min-width: 768px) {
+    width: ${({ theme }) => `calc(50% - ${theme.spacing.xl} / 2)`};
   }
 `;
 
-const ImageContainer = styled.div`
+const PokemonCardBox = styled(MidCardBox)`
+  align-items: center;
+  aspect-ratio: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
-  background-color: ${({ theme }) => theme.colors.secondary};
-  border-radius: ${({ theme }) => theme.borderRadius.large};
-  padding: ${({ theme }) => theme.spacing.lg};
-  aspect-ratio: 1;
 `;
 
 const PokemonImage = styled.img`
@@ -91,32 +86,10 @@ const PokemonImage = styled.img`
   object-fit: contain;
 `;
 
-const StatsContainer = styled.div`
-  background-color: white;
-  border-radius: ${({ theme }) => theme.borderRadius.large};
-  padding: ${({ theme }) => theme.spacing.lg};
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-  border: 1px solid ${({ theme }) => theme.colors.secondary};
-`;
-
 const SectionTitle = styled.h2`
   font-size: ${({ theme }) => theme.fontSizes.xlarge};
   margin-bottom: ${({ theme }) => theme.spacing.lg};
   color: ${({ theme }) => theme.colors.text};
-  text-align: center;
-`;
-
-const InfoGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: ${({ theme }) => theme.spacing.md};
-  margin-top: ${({ theme }) => theme.spacing.xl};
-`;
-
-const InfoCard = styled.div`
-  background-color: ${({ theme }) => theme.colors.secondary};
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-  padding: ${({ theme }) => theme.spacing.md};
   text-align: center;
 `;
 
@@ -158,24 +131,6 @@ const ErrorMessage = styled.p`
   color: ${({ theme }) => theme.colors.primary};
   font-size: ${({ theme }) => theme.fontSizes.large};
   margin-bottom: ${({ theme }) => theme.spacing.lg};
-`;
-
-const DescriptionContainer = styled.div`
-  background-color: white;
-  border-radius: ${({ theme }) => theme.borderRadius.large};
-  padding: ${({ theme }) => theme.spacing.lg};
-  margin-top: ${({ theme }) => theme.spacing.xl};
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-  border: 1px solid ${({ theme }) => theme.colors.secondary};
-`;
-
-const DescriptionText = styled.p`
-  font-size: ${({ theme }) => theme.fontSizes.medium};
-  line-height: 1.6;
-  color: ${({ theme }) => theme.colors.text};
-  text-align: justify;
-  margin: 0;
-  padding: 0;
 `;
 
 const cleanDescription = (description: string): string => {
@@ -255,14 +210,13 @@ const PokemonPage = () => {
         </Header>
 
         <Content>
-          <ImageContainer>
+          <PokemonCardBox $variant="secondary">
             <PokemonImage
               src={pokemon.sprites.front_default}
               alt={pokemon.name}
             />
-          </ImageContainer>
-
-          <StatsContainer>
+          </PokemonCardBox>
+          <MidCardBox>
             <SectionTitle>{t("statistics")}</SectionTitle>
             {pokemon.stats.map((stat) => (
               <PokemonStat
@@ -272,27 +226,17 @@ const PokemonPage = () => {
                 mainType={mainType}
               />
             ))}
-          </StatsContainer>
-        </Content>
-
-        {pokemon.description && (
-          <DescriptionContainer>
-            <DescriptionText>
-              {cleanDescription(pokemon.description)}
-            </DescriptionText>
-          </DescriptionContainer>
-        )}
-
-        <InfoGrid>
-          <InfoCard>
+          </MidCardBox>
+          <CardBox>{cleanDescription(pokemon.description)}</CardBox>
+          <MidCardBox $variant="secondary">
             <InfoLabel>{t("height")}</InfoLabel>
             <InfoValue>{pokemon.height / 10} m</InfoValue>
-          </InfoCard>
-          <InfoCard>
+          </MidCardBox>
+          <MidCardBox $variant="secondary">
             <InfoLabel>{t("weight")}</InfoLabel>
             <InfoValue>{pokemon.weight / 10} kg</InfoValue>
-          </InfoCard>
-        </InfoGrid>
+          </MidCardBox>
+        </Content>
       </>
     );
   }

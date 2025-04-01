@@ -1,8 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, FC } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 
-// Types pour les langues supportées
 type SupportedLanguage = "fr" | "en" | "es" | "it" | "de";
 
 type Language = {
@@ -43,7 +42,6 @@ interface LanguageSelectorProps {
   onLanguageChange?: (lang: SupportedLanguage) => void;
 }
 
-// Styles pour le sélecteur de langue
 const SelectorContainer = styled.div`
   position: relative;
   z-index: 10;
@@ -115,38 +113,29 @@ const LanguageOption = styled.button<{ $isActive: boolean }>`
   }
 `;
 
-const LanguageSelector: React.FC<LanguageSelectorProps> = ({
-  onLanguageChange,
-}) => {
+const LanguageSelector: FC<LanguageSelectorProps> = ({ onLanguageChange }) => {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Trouver les informations de la langue actuelle
   const currentLanguage =
     languages.find((lang) => lang.code === i18n.language) || languages[0];
 
-  // Gérer le clic sur une langue
   const handleLanguageClick = (langCode: SupportedLanguage) => {
-    // Ne rien faire si on clique sur la langue déjà sélectionnée
     if (langCode === i18n.language) {
       setIsOpen(false);
       return;
     }
 
-    // Changer la langue via i18next
     void i18n.changeLanguage(langCode);
 
-    // Notifier le parent si nécessaire
     if (onLanguageChange) {
       onLanguageChange(langCode);
     }
 
-    // Fermer le menu
     setIsOpen(false);
   };
 
-  // Fermer le menu quand on clique en dehors
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

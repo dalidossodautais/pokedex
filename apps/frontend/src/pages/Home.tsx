@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo, FC, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import PokemonLink from "../components/PokemonLink";
 import { Button, Card, Input } from "@pokedex/ui";
-import Layout from "../components/Layout";
+import PokemonLink from "@/components/PokemonLink";
+import Layout from "@/components/Layout";
 
 const Title = styled.h1`
   font-size: ${({ theme }) => theme.fontSizes.xxlarge};
@@ -41,7 +41,7 @@ const SearchButton = styled(Button)`
 
 const FEATURED_POKEMON_IDS = ["1", "4", "7", "25"];
 
-const Home: React.FC = () => {
+const Home: FC = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const { t } = useTranslation();
@@ -50,11 +50,11 @@ const Home: React.FC = () => {
     return searchTerm.trim() === "";
   }, [searchTerm]);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!isInvalidSearch) {
       void navigate(`/pokemon/${searchTerm.trim().toLowerCase()}`);

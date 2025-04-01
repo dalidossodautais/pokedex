@@ -1,5 +1,6 @@
-import React from "react";
+import { FC } from "react";
 import styled from "styled-components";
+import { getTypeColor } from "@/theme/pokemon";
 
 interface PokemonStatProps {
   statName: string;
@@ -51,18 +52,12 @@ const StatBar = styled.div<{ $value: number; $type: string }>`
     left: 0;
     height: 100%;
     width: ${({ $value }) => Math.min(($value / 255) * 100, 100)}%;
-    background-color: ${({ theme, $type }) =>
-      theme.colors.typeColors[$type as keyof typeof theme.colors.typeColors] ||
-      theme.colors.typeColors.normal};
+    background-color: ${({ $type }) => getTypeColor($type)};
     border-radius: 4px;
   }
 `;
 
-const PokemonStat: React.FC<PokemonStatProps> = ({
-  statName,
-  value,
-  mainType,
-}) => {
+const PokemonStat: FC<PokemonStatProps> = ({ statName, value, mainType }) => {
   return (
     <StatRow>
       <StatName>{statName}</StatName>
