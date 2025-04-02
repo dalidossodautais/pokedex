@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useGetPokemonByIdQuery } from "@/store/services/pokemon";
+import { useTranslation } from "react-i18next";
 
 interface PokemonLinkProps {
   id: string;
@@ -64,7 +65,12 @@ const Loader = styled.div`
 
 const PokemonLink = ({ id, onSelect }: PokemonLinkProps) => {
   const navigate = useNavigate();
-  const { data: pokemon, isLoading } = useGetPokemonByIdQuery(id);
+  const { i18n } = useTranslation();
+
+  const { data: pokemon, isLoading } = useGetPokemonByIdQuery({
+    id: id || "",
+    lang: i18n.language as "fr" | "en" | "es" | "it" | "de",
+  });
 
   const handleClick = useCallback(() => {
     if (onSelect) {
