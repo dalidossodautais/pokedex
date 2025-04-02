@@ -20,6 +20,8 @@ Ce monorepo contient tous les projets liés à l'application Pokedex.
 ## Installation
 
 ```bash
+# Suppression du fichier de lock si sur un OS autre que Windows
+rm -rf node_modules
 # Installation des dépendances
 pnpm install
 ```
